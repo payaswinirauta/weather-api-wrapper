@@ -1,0 +1,529 @@
+Index · HTML
+Copy
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🌤️ My Weather API</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ 
+    :root {
+      --sun:    #FFD93D;
+      --coral:  #FF6B6B;
+      --mint:   #6BCB77;
+      --sky:    #4ECDC4;
+      --indigo: #5C6BC0;
+      --bg:     #0D0F1A;
+      --card:   rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.1);
+      --text:   #F0F4FF;
+      --muted:  rgba(240,244,255,0.5);
+    }
+ 
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+ 
+    /* Animated background blobs */
+    .bg-blobs {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .blob {
+      position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.15;
+      animation: drift 12s ease-in-out infinite alternate;
+    }
+    .blob1 { width: 500px; height: 500px; background: var(--coral); top: -100px; left: -100px; animation-delay: 0s; }
+    .blob2 { width: 400px; height: 400px; background: var(--sky);   top: 30%; right: -80px; animation-delay: -4s; }
+    .blob3 { width: 350px; height: 350px; background: var(--sun);   bottom: -80px; left: 30%; animation-delay: -8s; }
+    @keyframes drift {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.1); }
+    }
+ 
+    /* Layout */
+    .wrapper {
+      position: relative; z-index: 1;
+      max-width: 900px; margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+ 
+    /* Header */
+    header { text-align: center; margin-bottom: 48px; animation: fadeDown 0.6s ease both; }
+    .logo { font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 900; line-height: 1; }
+    .logo span { background: linear-gradient(135deg, var(--sun), var(--coral), var(--sky)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .tagline { margin-top: 8px; color: var(--muted); font-size: 0.95rem; letter-spacing: 0.05em; }
+    .badge {
+      display: inline-block; margin-top: 14px;
+      padding: 4px 14px; border-radius: 999px;
+      background: rgba(78,205,196,0.15); border: 1px solid rgba(78,205,196,0.3);
+      color: var(--sky); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em;
+    }
+ 
+    /* Search bar */
+    .search-wrap {
+      display: flex; gap: 10px; margin-bottom: 40px;
+      animation: fadeDown 0.6s 0.15s ease both;
+    }
+    .search-input {
+      flex: 1; padding: 16px 22px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 500;
+      outline: none; transition: border 0.2s, box-shadow 0.2s;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-input:focus {
+      border-color: var(--sky);
+      box-shadow: 0 0 0 3px rgba(78,205,196,0.15);
+    }
+    .btn {
+      padding: 16px 28px; border: none; border-radius: 16px;
+      font-family: 'Outfit', sans-serif; font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; transition: transform 0.15s, opacity 0.15s;
+      white-space: nowrap;
+    }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background: linear-gradient(135deg, var(--sky), var(--indigo)); color: #fff; }
+    .btn-secondary { background: linear-gradient(135deg, var(--sun), var(--coral)); color: #fff; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+ 
+    /* Tabs */
+    .tabs {
+      display: flex; gap: 8px; margin-bottom: 28px;
+      animation: fadeDown 0.6s 0.25s ease both;
+    }
+    .tab {
+      padding: 10px 20px; border-radius: 12px; border: 1px solid var(--border);
+      background: var(--card); color: var(--muted);
+      font-family: 'Outfit', sans-serif; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, var(--sky), var(--indigo));
+      border-color: transparent; color: #fff;
+    }
+    .tab:hover:not(.active) { color: var(--text); border-color: var(--sky); }
+ 
+    /* Cards */
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 24px; padding: 28px;
+      backdrop-filter: blur(12px);
+      animation: fadeUp 0.5s ease both;
+    }
+ 
+    /* Current weather card */
+    .weather-main {
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 20px; align-items: start; margin-bottom: 24px;
+    }
+    .city-name {
+      font-family: 'Outfit', sans-serif; font-size: 1.8rem; font-weight: 700;
+    }
+    .city-sub { color: var(--muted); font-size: 0.9rem; margin-top: 2px; }
+    .temp-big {
+      font-family: 'Outfit', sans-serif; font-size: 4.5rem; font-weight: 900;
+      line-height: 1; text-align: right;
+      background: linear-gradient(135deg, var(--sun), var(--coral));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .condition-badge {
+      display: inline-block; margin-top: 8px;
+      padding: 5px 14px; border-radius: 999px;
+      background: rgba(255,211,61,0.15); border: 1px solid rgba(255,211,61,0.3);
+      color: var(--sun); font-size: 0.82rem; font-weight: 600;
+    }
+ 
+    /* Stats grid */
+    .stats {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px; margin-top: 8px;
+    }
+    .stat {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 16px; padding: 16px;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .stat:hover { transform: translateY(-2px); background: rgba(255,255,255,0.08); }
+    .stat-icon { font-size: 1.4rem; margin-bottom: 6px; }
+    .stat-val {
+      font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700;
+    }
+    .stat-label { color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
+ 
+    /* Cache badge */
+    .cache-tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 999px; font-size: 0.75rem; font-weight: 600;
+      margin-bottom: 20px;
+    }
+    .cache-tag.live { background: rgba(107,203,119,0.15); border: 1px solid rgba(107,203,119,0.3); color: var(--mint); }
+    .cache-tag.cached { background: rgba(92,107,192,0.15); border: 1px solid rgba(92,107,192,0.3); color: #9FA8DA; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+ 
+    /* Forecast */
+    .forecast-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 12px;
+    }
+    .forecast-day {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 18px; padding: 16px 12px; text-align: center;
+      transition: transform 0.2s, background 0.2s;
+    }
+    .forecast-day:hover { transform: translateY(-3px); background: rgba(255,255,255,0.08); }
+    .f-date { color: var(--muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .f-icon { font-size: 1.8rem; margin: 8px 0; }
+    .f-max { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--sun); }
+    .f-min { font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: var(--muted); }
+    .f-rain { font-size: 0.72rem; color: var(--sky); margin-top: 4px; }
+ 
+    /* Compare */
+    .compare-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .compare-card {
+      background: rgba(255,255,255,0.04); border: 1px solid var(--border);
+      border-radius: 20px; padding: 20px;
+      transition: transform 0.2s;
+    }
+    .compare-card:hover { transform: translateY(-3px); }
+    .compare-city { font-family: 'Outfit', sans-serif; font-size: 1.1rem; font-weight: 700; }
+    .compare-country { color: var(--muted); font-size: 0.8rem; }
+    .compare-temp {
+      font-family: 'Outfit', sans-serif; font-size: 2.5rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--sky), var(--indigo));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin: 8px 0 4px;
+    }
+    .compare-cond { font-size: 0.82rem; color: var(--muted); }
+ 
+    /* Compare input row */
+    .compare-inputs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .compare-inputs input {
+      flex: 1; min-width: 120px; padding: 12px 16px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; color: var(--text);
+      font-family: 'Outfit', sans-serif; font-size: 0.9rem; outline: none;
+      transition: border 0.2s;
+    }
+    .compare-inputs input:focus { border-color: var(--sky); }
+    .compare-inputs input::placeholder { color: var(--muted); }
+ 
+    /* Loading */
+    .loading {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+    }
+    .spinner {
+      width: 40px; height: 40px; border: 3px solid var(--border);
+      border-top-color: var(--sky); border-radius: 50%;
+      animation: spin 0.8s linear infinite; margin: 0 auto 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+ 
+    /* Error */
+    .error-box {
+      background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3);
+      border-radius: 16px; padding: 20px; color: var(--coral); text-align: center;
+    }
+ 
+    /* Empty state */
+    .empty {
+      text-align: center; padding: 60px 20px; color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+ 
+    /* Animations */
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
+ 
+    /* Section title */
+    .section-title {
+      font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+ 
+    @media (max-width: 500px) {
+      .weather-main { grid-template-columns: 1fr; }
+      .temp-big { text-align: left; font-size: 3.5rem; }
+      .logo { font-size: 2rem; }
+    }
+  </style>
+</head>
+<body>
+ 
+<div class="bg-blobs">
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+</div>
+ 
+<div class="wrapper">
+ 
+  <!-- Header -->
+  <header>
+    <div class="logo"><span>🌤️ WeatherAPI</span></div>
+    <p class="tagline">Real-time weather for any city worldwide</p>
+    <span class="badge">⚡ Powered by Open-Meteo · No API Key · Redis Cached</span>
+  </header>
+ 
+  <!-- Search -->
+  <div class="search-wrap">
+    <input class="search-input" id="cityInput" type="text" placeholder="Enter city name... e.g. Bhubaneswar" />
+    <button class="btn btn-primary" onclick="fetchWeather()">Get Weather</button>
+  </div>
+ 
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('current')">🌡️ Current</div>
+    <div class="tab" onclick="switchTab('forecast')">📅 7-Day Forecast</div>
+    <div class="tab" onclick="switchTab('compare')">🔀 Compare Cities</div>
+  </div>
+ 
+  <!-- Current Weather Panel -->
+  <div id="panel-current">
+    <div id="current-result">
+      <div class="empty">
+        <div class="empty-icon">🌍</div>
+        <p>Enter a city name above and click <strong>Get Weather</strong></p>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Forecast Panel -->
+  <div id="panel-forecast" style="display:none">
+    <div id="forecast-result">
+      <div class="empty">
+        <div class="empty-icon">📅</div>
+        <p>Enter a city name above and click <strong>Get Weather</strong></p>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Compare Panel -->
+  <div id="panel-compare" style="display:none">
+    <div class="card">
+      <p class="section-title">Compare up to 5 cities</p>
+      <div class="compare-inputs">
+        <input type="text" placeholder="City 1" id="c1" value="Delhi"/>
+        <input type="text" placeholder="City 2" id="c2" value="Mumbai"/>
+        <input type="text" placeholder="City 3" id="c3" value="Kolkata"/>
+        <input type="text" placeholder="City 4" id="c4"/>
+        <input type="text" placeholder="City 5" id="c5"/>
+      </div>
+      <button class="btn btn-secondary" onclick="fetchCompare()">Compare Cities</button>
+    </div>
+    <div id="compare-result" style="margin-top:20px"></div>
+  </div>
+ 
+</div>
+ 
+<script>
+  let activeTab = 'current';
+ 
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', ['current','forecast','compare'][i] === tab);
+    });
+    document.getElementById('panel-current').style.display  = tab === 'current'  ? 'block' : 'none';
+    document.getElementById('panel-forecast').style.display = tab === 'forecast' ? 'block' : 'none';
+    document.getElementById('panel-compare').style.display  = tab === 'compare'  ? 'block' : 'none';
+  }
+ 
+  function fetchWeather() {
+    const city = document.getElementById('cityInput').value.trim();
+    if (!city) return;
+    if (activeTab === 'current')  fetchCurrent(city);
+    if (activeTab === 'forecast') fetchForecast(city);
+    if (activeTab === 'compare')  switchTab('compare');
+  }
+ 
+  document.getElementById('cityInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') fetchWeather();
+  });
+ 
+  function showLoading(id) {
+    document.getElementById(id).innerHTML = `
+      <div class="loading">
+        <div class="spinner"></div>
+        <p>Fetching weather data...</p>
+      </div>`;
+  }
+ 
+  function showError(id, msg) {
+    document.getElementById(id).innerHTML = `
+      <div class="error-box">❌ ${msg}</div>`;
+  }
+ 
+  function getConditionIcon(condition) {
+    const c = condition.toLowerCase();
+    if (c.includes('clear') || c.includes('sunny')) return '☀️';
+    if (c.includes('partly')) return '⛅';
+    if (c.includes('overcast') || c.includes('cloudy')) return '☁️';
+    if (c.includes('drizzle')) return '🌦️';
+    if (c.includes('rain') || c.includes('shower')) return '🌧️';
+    if (c.includes('snow')) return '❄️';
+    if (c.includes('thunder')) return '⛈️';
+    if (c.includes('fog')) return '🌫️';
+    return '🌡️';
+  }
+ 
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+ 
+  async function fetchCurrent(city) {
+    showLoading('current-result');
+    try {
+      const res  = await fetch(`/api/weather/${encodeURIComponent(city)}`);
+      const json = await res.json();
+      if (!json.success) { showError('current-result', json.error); return; }
+ 
+      const w = json.data.weather;
+      const icon = getConditionIcon(w.condition);
+ 
+      document.getElementById('current-result').innerHTML = `
+        <div class="${json.data.weather.source === 'cache' ? 'cache-tag cached' : 'cache-tag live'}">
+          <span class="dot"></span>
+          ${w.source === 'cache' ? '⚡ Served from Redis Cache' : '🌐 Live from Open-Meteo'}
+        </div>
+        <div class="card">
+          <div class="weather-main">
+            <div>
+              <div class="city-name">${icon} ${w.city}</div>
+              <div class="city-sub">${w.region ? w.region + ', ' : ''}${w.country}</div>
+              <div class="condition-badge">${w.condition}</div>
+            </div>
+            <div class="temp-big">${w.temperature_c}°</div>
+          </div>
+          <div class="stats">
+            <div class="stat">
+              <div class="stat-icon">🤔</div>
+              <div class="stat-val">${w.feels_like_c}°C</div>
+              <div class="stat-label">Feels Like</div>
+            </div>
+            <div class="stat">
+              <div class="stat-icon">💧</div>
+              <div class="stat-val">${w.humidity_percent}%</div>
+              <div class="stat-label">Humidity</div>
+            </div>
+            <div class="stat">
+              <div class="stat-icon">💨</div>
+              <div class="stat-val">${w.wind_speed_kmh} km/h</div>
+              <div class="stat-label">Wind Speed</div>
+            </div>
+            <div class="stat">
+              <div class="stat-icon">🌂</div>
+              <div class="stat-val">${w.precipitation_mm} mm</div>
+              <div class="stat-label">Precipitation</div>
+            </div>
+            <div class="stat">
+              <div class="stat-icon">☀️</div>
+              <div class="stat-val">${w.uv_index}</div>
+              <div class="stat-label">UV Index</div>
+            </div>
+            <div class="stat">
+              <div class="stat-icon">👁️</div>
+              <div class="stat-val">${(w.visibility_m / 1000).toFixed(1)} km</div>
+              <div class="stat-label">Visibility</div>
+            </div>
+          </div>
+        </div>`;
+    } catch (e) {
+      showError('current-result', 'Could not connect to API. Is the server running?');
+    }
+  }
+ 
+  async function fetchForecast(city) {
+    showLoading('forecast-result');
+    try {
+      const res  = await fetch(`/api/weather/${encodeURIComponent(city)}/forecast`);
+      const json = await res.json();
+      if (!json.success) { showError('forecast-result', json.error); return; }
+ 
+      const f = json.data.forecast;
+      const days = f.days.map(d => `
+        <div class="forecast-day">
+          <div class="f-date">${formatDate(d.date)}</div>
+          <div class="f-icon">${getConditionIcon(d.condition)}</div>
+          <div class="f-max">${d.max_temp_c}°</div>
+          <div class="f-min">${d.min_temp_c}°</div>
+          <div class="f-rain">🌧 ${d.rain_chance_percent}%</div>
+        </div>`).join('');
+ 
+      document.getElementById('forecast-result').innerHTML = `
+        <div class="${json.data.forecast.source === 'cache' ? 'cache-tag cached' : 'cache-tag live'}">
+          <span class="dot"></span>
+          ${f.source === 'cache' ? '⚡ Served from Redis Cache' : '🌐 Live from Open-Meteo'}
+        </div>
+        <div class="card">
+          <p class="section-title">7-Day Forecast — ${f.city}, ${f.country}</p>
+          <div class="forecast-grid">${days}</div>
+        </div>`;
+    } catch (e) {
+      showError('forecast-result', 'Could not connect to API. Is the server running?');
+    }
+  }
+ 
+  async function fetchCompare() {
+    const cities = ['c1','c2','c3','c4','c5']
+      .map(id => document.getElementById(id).value.trim())
+      .filter(Boolean);
+ 
+    if (cities.length < 2) {
+      document.getElementById('compare-result').innerHTML =
+        `<div class="error-box">Please enter at least 2 cities!</div>`;
+      return;
+    }
+ 
+    showLoading('compare-result');
+    try {
+      const res  = await fetch(`/api/weather/compare?cities=${cities.join(',')}`);
+      const json = await res.json();
+      if (!json.success) { showError('compare-result', json.error); return; }
+ 
+      const cards = json.data.comparison.map(w => {
+        if (w.error) return `
+          <div class="compare-card">
+            <div class="compare-city">❓ ${w.city}</div>
+            <div class="compare-country" style="color:var(--coral)">${w.error}</div>
+          </div>`;
+        return `
+          <div class="compare-card">
+            <div class="compare-city">${getConditionIcon(w.condition)} ${w.city}</div>
+            <div class="compare-country">${w.country}</div>
+            <div class="compare-temp">${w.temperature_c}°C</div>
+            <div class="compare-cond">${w.condition}</div>
+            <div style="margin-top:10px; display:flex; flex-direction:column; gap:4px; font-size:0.8rem; color:var(--muted)">
+              <span>💧 ${w.humidity_percent}% humidity</span>
+              <span>💨 ${w.wind_speed_kmh} km/h wind</span>
+              <span>🤔 Feels ${w.feels_like_c}°C</span>
+            </div>
+          </div>`;
+      }).join('');
+ 
+      document.getElementById('compare-result').innerHTML = `
+        <div class="compare-grid">${cards}</div>`;
+    } catch (e) {
+      showError('compare-result', 'Could not connect to API. Is the server running?');
+    }
+  }
+</script>
+</body>
+</html>
+ 
