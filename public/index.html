@@ -1,6 +1,3 @@
-Index · HTML
-Copy
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,7 +7,7 @@ Copy
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet"/>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
- 
+
     :root {
       --sun:    #FFD93D;
       --coral:  #FF6B6B;
@@ -23,7 +20,7 @@ Copy
       --text:   #F0F4FF;
       --muted:  rgba(240,244,255,0.5);
     }
- 
+
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--bg);
@@ -31,7 +28,7 @@ Copy
       min-height: 100vh;
       overflow-x: hidden;
     }
- 
+
     /* Animated background blobs */
     .bg-blobs {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -48,14 +45,14 @@ Copy
       from { transform: translate(0, 0) scale(1); }
       to   { transform: translate(40px, 30px) scale(1.1); }
     }
- 
+
     /* Layout */
     .wrapper {
       position: relative; z-index: 1;
       max-width: 900px; margin: 0 auto;
       padding: 40px 20px 80px;
     }
- 
+
     /* Header */
     header { text-align: center; margin-bottom: 48px; animation: fadeDown 0.6s ease both; }
     .logo { font-family: 'Outfit', sans-serif; font-size: 2.8rem; font-weight: 900; line-height: 1; }
@@ -67,7 +64,7 @@ Copy
       background: rgba(78,205,196,0.15); border: 1px solid rgba(78,205,196,0.3);
       color: var(--sky); font-size: 0.78rem; font-weight: 600; letter-spacing: 0.08em;
     }
- 
+
     /* Search bar */
     .search-wrap {
       display: flex; gap: 10px; margin-bottom: 40px;
@@ -95,7 +92,7 @@ Copy
     .btn-primary { background: linear-gradient(135deg, var(--sky), var(--indigo)); color: #fff; }
     .btn-secondary { background: linear-gradient(135deg, var(--sun), var(--coral)); color: #fff; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
- 
+
     /* Tabs */
     .tabs {
       display: flex; gap: 8px; margin-bottom: 28px;
@@ -112,7 +109,7 @@ Copy
       border-color: transparent; color: #fff;
     }
     .tab:hover:not(.active) { color: var(--text); border-color: var(--sky); }
- 
+
     /* Cards */
     .card {
       background: var(--card); border: 1px solid var(--border);
@@ -120,7 +117,7 @@ Copy
       backdrop-filter: blur(12px);
       animation: fadeUp 0.5s ease both;
     }
- 
+
     /* Current weather card */
     .weather-main {
       display: grid; grid-template-columns: 1fr auto;
@@ -142,7 +139,7 @@ Copy
       background: rgba(255,211,61,0.15); border: 1px solid rgba(255,211,61,0.3);
       color: var(--sun); font-size: 0.82rem; font-weight: 600;
     }
- 
+
     /* Stats grid */
     .stats {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -159,7 +156,7 @@ Copy
       font-family: 'Outfit', sans-serif; font-size: 1.3rem; font-weight: 700;
     }
     .stat-label { color: var(--muted); font-size: 0.75rem; margin-top: 2px; }
- 
+
     /* Cache badge */
     .cache-tag {
       display: inline-flex; align-items: center; gap: 5px;
@@ -170,7 +167,7 @@ Copy
     .cache-tag.cached { background: rgba(92,107,192,0.15); border: 1px solid rgba(92,107,192,0.3); color: #9FA8DA; }
     .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
- 
+
     /* Forecast */
     .forecast-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
@@ -187,7 +184,7 @@ Copy
     .f-max { font-family: 'Outfit', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--sun); }
     .f-min { font-family: 'Outfit', sans-serif; font-size: 0.85rem; color: var(--muted); }
     .f-rain { font-size: 0.72rem; color: var(--sky); margin-top: 4px; }
- 
+
     /* Compare */
     .compare-grid {
       display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -208,7 +205,7 @@ Copy
       margin: 8px 0 4px;
     }
     .compare-cond { font-size: 0.82rem; color: var(--muted); }
- 
+
     /* Compare input row */
     .compare-inputs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
     .compare-inputs input {
@@ -220,7 +217,7 @@ Copy
     }
     .compare-inputs input:focus { border-color: var(--sky); }
     .compare-inputs input::placeholder { color: var(--muted); }
- 
+
     /* Loading */
     .loading {
       text-align: center; padding: 60px 20px; color: var(--muted);
@@ -231,31 +228,31 @@ Copy
       animation: spin 0.8s linear infinite; margin: 0 auto 16px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
- 
+
     /* Error */
     .error-box {
       background: rgba(255,107,107,0.1); border: 1px solid rgba(255,107,107,0.3);
       border-radius: 16px; padding: 20px; color: var(--coral); text-align: center;
     }
- 
+
     /* Empty state */
     .empty {
       text-align: center; padding: 60px 20px; color: var(--muted);
       font-size: 0.95rem;
     }
     .empty-icon { font-size: 3rem; margin-bottom: 12px; }
- 
+
     /* Animations */
     @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
     @keyframes fadeUp   { from { opacity:0; transform:translateY(16px);  } to { opacity:1; transform:translateY(0); } }
- 
+
     /* Section title */
     .section-title {
       font-family: 'Outfit', sans-serif; font-size: 1rem; font-weight: 700;
       color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em;
       margin-bottom: 16px;
     }
- 
+
     @media (max-width: 500px) {
       .weather-main { grid-template-columns: 1fr; }
       .temp-big { text-align: left; font-size: 3.5rem; }
@@ -264,35 +261,33 @@ Copy
   </style>
 </head>
 <body>
- 
+
 <div class="bg-blobs">
   <div class="blob blob1"></div>
   <div class="blob blob2"></div>
   <div class="blob blob3"></div>
 </div>
- 
+
 <div class="wrapper">
- 
+
   <!-- Header -->
   <header>
     <div class="logo"><span>🌤️ WeatherAPI</span></div>
-    <p class="tagline">Real-time weather for any city worldwide</p>
-    <span class="badge">⚡ Powered by Open-Meteo · No API Key · Redis Cached</span>
   </header>
- 
+
   <!-- Search -->
   <div class="search-wrap">
     <input class="search-input" id="cityInput" type="text" placeholder="Enter city name... e.g. Bhubaneswar" />
     <button class="btn btn-primary" onclick="fetchWeather()">Get Weather</button>
   </div>
- 
+
   <!-- Tabs -->
   <div class="tabs">
     <div class="tab active" onclick="switchTab('current')">🌡️ Current</div>
     <div class="tab" onclick="switchTab('forecast')">📅 7-Day Forecast</div>
     <div class="tab" onclick="switchTab('compare')">🔀 Compare Cities</div>
   </div>
- 
+
   <!-- Current Weather Panel -->
   <div id="panel-current">
     <div id="current-result">
@@ -302,7 +297,7 @@ Copy
       </div>
     </div>
   </div>
- 
+
   <!-- Forecast Panel -->
   <div id="panel-forecast" style="display:none">
     <div id="forecast-result">
@@ -312,7 +307,7 @@ Copy
       </div>
     </div>
   </div>
- 
+
   <!-- Compare Panel -->
   <div id="panel-compare" style="display:none">
     <div class="card">
@@ -328,12 +323,12 @@ Copy
     </div>
     <div id="compare-result" style="margin-top:20px"></div>
   </div>
- 
+
 </div>
- 
+
 <script>
   let activeTab = 'current';
- 
+
   function switchTab(tab) {
     activeTab = tab;
     document.querySelectorAll('.tab').forEach((t, i) => {
@@ -343,7 +338,7 @@ Copy
     document.getElementById('panel-forecast').style.display = tab === 'forecast' ? 'block' : 'none';
     document.getElementById('panel-compare').style.display  = tab === 'compare'  ? 'block' : 'none';
   }
- 
+
   function fetchWeather() {
     const city = document.getElementById('cityInput').value.trim();
     if (!city) return;
@@ -351,11 +346,11 @@ Copy
     if (activeTab === 'forecast') fetchForecast(city);
     if (activeTab === 'compare')  switchTab('compare');
   }
- 
+
   document.getElementById('cityInput').addEventListener('keydown', e => {
     if (e.key === 'Enter') fetchWeather();
   });
- 
+
   function showLoading(id) {
     document.getElementById(id).innerHTML = `
       <div class="loading">
@@ -363,12 +358,12 @@ Copy
         <p>Fetching weather data...</p>
       </div>`;
   }
- 
+
   function showError(id, msg) {
     document.getElementById(id).innerHTML = `
       <div class="error-box">❌ ${msg}</div>`;
   }
- 
+
   function getConditionIcon(condition) {
     const c = condition.toLowerCase();
     if (c.includes('clear') || c.includes('sunny')) return '☀️';
@@ -381,22 +376,22 @@ Copy
     if (c.includes('fog')) return '🌫️';
     return '🌡️';
   }
- 
+
   function formatDate(dateStr) {
     const d = new Date(dateStr);
     return d.toLocaleDateString('en-IN', { weekday: 'short', month: 'short', day: 'numeric' });
   }
- 
+
   async function fetchCurrent(city) {
     showLoading('current-result');
     try {
       const res  = await fetch(`/api/weather/${encodeURIComponent(city)}`);
       const json = await res.json();
       if (!json.success) { showError('current-result', json.error); return; }
- 
+
       const w = json.data.weather;
       const icon = getConditionIcon(w.condition);
- 
+
       document.getElementById('current-result').innerHTML = `
         <div class="${json.data.weather.source === 'cache' ? 'cache-tag cached' : 'cache-tag live'}">
           <span class="dot"></span>
@@ -448,14 +443,14 @@ Copy
       showError('current-result', 'Could not connect to API. Is the server running?');
     }
   }
- 
+
   async function fetchForecast(city) {
     showLoading('forecast-result');
     try {
       const res  = await fetch(`/api/weather/${encodeURIComponent(city)}/forecast`);
       const json = await res.json();
       if (!json.success) { showError('forecast-result', json.error); return; }
- 
+
       const f = json.data.forecast;
       const days = f.days.map(d => `
         <div class="forecast-day">
@@ -465,7 +460,7 @@ Copy
           <div class="f-min">${d.min_temp_c}°</div>
           <div class="f-rain">🌧 ${d.rain_chance_percent}%</div>
         </div>`).join('');
- 
+
       document.getElementById('forecast-result').innerHTML = `
         <div class="${json.data.forecast.source === 'cache' ? 'cache-tag cached' : 'cache-tag live'}">
           <span class="dot"></span>
@@ -479,24 +474,24 @@ Copy
       showError('forecast-result', 'Could not connect to API. Is the server running?');
     }
   }
- 
+
   async function fetchCompare() {
     const cities = ['c1','c2','c3','c4','c5']
       .map(id => document.getElementById(id).value.trim())
       .filter(Boolean);
- 
+
     if (cities.length < 2) {
       document.getElementById('compare-result').innerHTML =
         `<div class="error-box">Please enter at least 2 cities!</div>`;
       return;
     }
- 
+
     showLoading('compare-result');
     try {
       const res  = await fetch(`/api/weather/compare?cities=${cities.join(',')}`);
       const json = await res.json();
       if (!json.success) { showError('compare-result', json.error); return; }
- 
+
       const cards = json.data.comparison.map(w => {
         if (w.error) return `
           <div class="compare-card">
@@ -516,7 +511,7 @@ Copy
             </div>
           </div>`;
       }).join('');
- 
+
       document.getElementById('compare-result').innerHTML = `
         <div class="compare-grid">${cards}</div>`;
     } catch (e) {
@@ -526,4 +521,3 @@ Copy
 </script>
 </body>
 </html>
- 
