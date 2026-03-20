@@ -395,7 +395,7 @@
       document.getElementById('current-result').innerHTML = `
         <div class="${json.data.weather.source === 'cache' ? 'cache-tag cached' : 'cache-tag live'}">
           <span class="dot"></span>
-          ${w.source === 'cache' ? '⚡ Served from Redis Cache' : '🌐 Live from Open-Meteo'}
+          ${w.source === 'cache' ? '⚡ Served from Redis Cache' : '🌐 Live'}
         </div>
         <div class="card">
           <div class="weather-main">
@@ -464,7 +464,7 @@
       document.getElementById('forecast-result').innerHTML = `
         <div class="${json.data.forecast.source === 'cache' ? 'cache-tag cached' : 'cache-tag live'}">
           <span class="dot"></span>
-          ${f.source === 'cache' ? '⚡LIVE' : '🌐 Live'}
+          ${f.source === 'cache' ? '⚡Served from Redis Cache' : '🌐 Live'}
         </div>
         <div class="card">
           <p class="section-title">7-Day Forecast — ${f.city}, ${f.country}</p>
