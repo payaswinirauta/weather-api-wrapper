@@ -2,7 +2,7 @@
 
 A lightweight REST API built with **Node.js** and **Express** that provides real-time weather data and 7-day forecasts without requiring an API key. Powered by the open-source [Open-Meteo API](https://open-meteo.com/) and optimized with **Redis caching** for fast response times.
 
-> **Live Demo:** [Deployed on Render](https://render.com) — auto-deployed via GitHub integration
+> **Live Demo:** [Deployed on Render](https://weather-api-wrapper-jwvx.onrender.com/) — auto-deployed via GitHub integration
 
 ---
 
